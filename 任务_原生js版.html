@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>demo03</title>
+    <style>
+        #all{
+            background-color: #fbf8fd;
+            width: 460px;height: 752px;
+            overflow: hidden;
+            margin: 0px auto;
+        }
+        /* 上方按钮区域 */
+        #top_list{
+            /* background-color: black; */
+            width: auto;
+            white-space:nowrap;
+            padding-left: 10px;
+            user-select: none;
+            background-color: #424776;
+        }
+        .top_button{
+            width: 80px;
+            height: 135px;
+            border-radius: 40px;
+            background-color: #fefefe;
+            color: #424776;
+            padding-top: 40px;
+            box-sizing: border-box;
+            margin-right: 15px;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .top_button strong{
+            display: block;
+            text-align: center;
+            font-size: 32px;
+        }
+        .top_button abbr{
+            display: block;
+            text-align: center;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .top_button_Sel{background-color: #867eff;border: 1px solid #898595;}
+        /* 下方内容区域 */
+        #content_list{
+            height: 616px;
+            /* background-color: aqua; */
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+        .option_page{
+            width: 460px;
+            height: 616px;
+            margin-top: 40px;
+            text-align: center;
+            box-sizing: border-box;
+            display: inline-block;
+            position: absolute;
+            left: 100%;
+            transition: all 0.4s;
+            /* transform: translateX(-100%); */
+        }
+        .option_page:nth-child(1){transform: translateX(-100%);}
+        .option{
+            height: 75px;margin-bottom: 40px;
+        }
+        .left{
+            float: left;
+            height: 50px;width: 125px;
+            margin-top: 13px;font-size: 16px;
+            background-color: #fff;
+            color: #9b9aa3;
+            line-height: 50px;
+        }
+        .right{
+            float: left;
+            margin-left: -15px;border-radius: 35px;
+            height: 75px;width: 315px;
+            background-color: #e9e9e9;
+            color: #fff;
+            font-size: 22px;
+            line-height: 75px;
+        }
+    </style>
+</head>
+<body>
+    <section id="all">
+        <section id="top_list">
+            <!-- 样本 -->
+            <!-- <article class="top_button">
+                <strong>13</strong>
+                <abbr title="星期一">Mon</abbr>
+            </article> -->
+        </section>
+        <section id="content_list">
+            <!-- 模块样本 -->
+            <!-- <article class="option_page"> -->
+                <!-- 子组件样本 -->
+                <!-- <section class="option">
+                    <section class="left">头条</section>
+                    <section class="right">该位置已处理</section>
+                </section> -->
+            <!-- </article> -->
+        </section>
+    </section>
+</body>
+<script src="./all.js"></script>
+<script>
+    // 节点区域
+    let top_list = document.getElementById('top_list');
+    let content_list = document.getElementById('content_list');
+
+
+    // 数据渲染
+    (() =>{
+        // 依赖数据区
+        let date = new Date();
+        let day = date.getDate();//当前天数
+        let residue_day = new Date(date.getFullYear(),date.getMonth()+1,0).getDate() - day + 1;//这个月剩下多少天（算上今天）
+        let week = date.getDay();//今天星期几
+
+        // 开始拼接并渲染
+        let data = ''
+        let i = 0;
+        let weekArray = ['Mon','Tue','Wed','Thu','Fri','Sat','Sum']
+        for(; i < residue_day; i++){
+            data += 
+                '<article class="top_button">'+
+                    '<strong>'+ (day + i) +'</strong>'+
+                    '<abbr title="">'+ (weekArray[(week + i-1) % 7]) +'</abbr>'+
+                '</article>'
+        }
+        top_list.innerHTML = data;//渲染上方按钮
+
+        data = ''
+        let leftArray = ['头条','第二条','第三条','第四条']
+        for(i = 0;i < residue_day;i++){
+            data += '<article class="option_page">'
+                for(let i2 = 0; i2 < leftArray.length; i2++){
+                    data += 
+                        '<section class="option">'+
+                            '<section class="left">'+ leftArray[i2] +'</section>'+
+                            '<section class="right">该位置已处理</section>'+
+                        '</section>'
+                }
+            data += ' </article>'
+        }
+        content_list.innerHTML = data;//渲染下方内容模块
+    })();
+
+    // 新节点区
+    let top_buttonS = top_list.getElementsByClassName('top_button');//上方所有按钮
+    let option_pageS = content_list.getElementsByClassName('option_page');//下方所有模块
+    top_list_width = top_buttonS[top_buttonS.length-1].offsetLeft + 80;
+    top_list.style.width = top_list_width + 'px';
+    top_list_width -= 460;
+
+    //功能变量区
+    let old_index = 0;//记录上一个按钮
+    let sel_index = 0;//记录选中的按钮
+    let nowTime = 0;
+    let top_button_Fn = (event) =>{//【事件处理函数】
+        sel_index = event.group_Button_Id;
+        if(sel_index == old_index){return;}
+        
+        let is_right = sel_index > old_index ? ['-200%','0%'] : ['0%','-200%'];//true为向右移动
+        option_pageS[sel_index].style.transition = 'all 0s';
+        option_pageS[sel_index].style.transform = 'translateX('+ is_right[1] +')';
+        setTimeout(() => {
+            option_pageS[sel_index].style.transition = 'all 0.4s';
+            option_pageS[sel_index].style.transform = 'translateX(-100%)';
+            option_pageS[old_index].style.transform = 'translateX('+ is_right[0] +')';
+            old_index = sel_index;
+        }, 50);
+    }
+    addRadioGroup(top_buttonS,'top_button_Sel','',true,top_button_Fn)
+    top_buttonS[0].click();
+
+    //拖拽
+    let on_off = false;//开关
+    let placeX = 0;//鼠标横向位置
+    let top_button_X = 0;//按钮模块目前的位置
+    top_list.addEventListener('mousedown',(event) => {
+        on_off = true;
+        placeX = event.clientX;
+    })
+    window.addEventListener('mouseup',(event) => {
+        on_off = false;
+        let x = event.clientX - placeX//若为正数则说明鼠标向右移动
+        top_button_X = top_button_X + x > 0 ? 0 : top_button_X + x;
+        top_button_X = top_button_X < -top_list_width ? -top_list_width : top_button_X;
+        top_list.style.transition = 'all 1s'
+        top_list.style.transform = 'translateX('+ top_button_X +'px)'//更新位置
+        setTimeout(() => {
+            top_list.style.transition = 'all 0s'
+        }, 1000);
+    })
+    window.addEventListener('mousemove',(event) => {
+        if(!on_off){return;}
+        let x = (event.clientX - placeX)/30;//若为正数则说明鼠标向右移动
+        top_button_X = top_button_X + x > 0 ? 0 : top_button_X + x;
+        top_button_X = top_button_X < -top_list_width ? -top_list_width : top_button_X;
+        top_list.style.transform = 'translateX('+ top_button_X +'px)'//更新位置
+    })
+
+</script>
+</html>
